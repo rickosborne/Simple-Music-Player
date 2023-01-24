@@ -12,6 +12,7 @@ import com.simplemobiletools.musicplayer.helpers.EXTRA_ARTIST
 import com.simplemobiletools.musicplayer.helpers.EXTRA_ARTIST_ID
 import com.simplemobiletools.musicplayer.helpers.EXTRA_COVER_ART
 import com.simplemobiletools.musicplayer.helpers.EXTRA_DATE_ADDED
+import com.simplemobiletools.musicplayer.helpers.EXTRA_DISC_NUMBER
 import com.simplemobiletools.musicplayer.helpers.EXTRA_DURATION
 import com.simplemobiletools.musicplayer.helpers.EXTRA_FLAGS
 import com.simplemobiletools.musicplayer.helpers.EXTRA_FOLDER_NAME
@@ -37,6 +38,7 @@ fun buildMediaItem(
     mediaType: @MediaMetadata.MediaType Int,
     trackCnt: Int? = null,
     trackNumber: Int? = null,
+    discNumber: Int? = null,
     year: Int? = null,
     sourceUri: Uri? = null,
     artworkUri: Uri? = null,
@@ -51,6 +53,7 @@ fun buildMediaItem(
         .setIsPlayable(mediaType == MediaMetadata.MEDIA_TYPE_MUSIC)
         .setTotalTrackCount(trackCnt)
         .setTrackNumber(trackNumber)
+        .setDiscNumber(discNumber)
         .setReleaseYear(year)
         .setMediaType(MediaMetadata.MEDIA_TYPE_MUSIC)
         .setArtworkUri(artworkUri)
@@ -77,6 +80,7 @@ fun Track.toMediaItem(): MediaItem {
         genre = genre,
         mediaType = MediaMetadata.MEDIA_TYPE_MUSIC,
         trackNumber = trackId,
+        discNumber = discNumber,
         sourceUri = getUri(),
         artworkUri = coverArt.toUri(),
         track = this
@@ -162,7 +166,8 @@ private fun createBundleFromTrack(track: Track) = bundleOf(
     EXTRA_YEAR to track.year,
     EXTRA_DATE_ADDED to track.dateAdded,
     EXTRA_ORDER_IN_PLAYLIST to track.orderInPlaylist,
-    EXTRA_FLAGS to track.flags
+    EXTRA_FLAGS to track.flags,
+    EXTRA_DISC_NUMBER to track.discNumber
 )
 
 private fun createTrackFromBundle(bundle: Bundle): Track {
@@ -185,6 +190,7 @@ private fun createTrackFromBundle(bundle: Bundle): Track {
         year = bundle.getInt(EXTRA_YEAR),
         dateAdded = bundle.getInt(EXTRA_DATE_ADDED),
         orderInPlaylist = bundle.getInt(EXTRA_ORDER_IN_PLAYLIST),
-        flags = bundle.getInt(EXTRA_FLAGS)
+        flags = bundle.getInt(EXTRA_FLAGS),
+        discNumber = bundle.getInt(EXTRA_DISC_NUMBER),
     )
 }

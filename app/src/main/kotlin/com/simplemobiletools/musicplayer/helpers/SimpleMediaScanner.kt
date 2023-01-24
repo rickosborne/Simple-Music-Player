@@ -9,6 +9,7 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
 import android.provider.MediaStore.Audio
+import android.util.Log
 import com.simplemobiletools.commons.extensions.*
 import com.simplemobiletools.commons.helpers.ensureBackgroundThread
 import com.simplemobiletools.commons.helpers.isQPlus
@@ -232,6 +233,7 @@ class SimpleMediaScanner(private val context: Application) {
             val title = cursor.getStringValue(Audio.Media.TITLE)
             val duration = cursor.getIntValue(Audio.Media.DURATION) / 1000
             val trackId = cursor.getIntValue(Audio.Media.TRACK) % 1000
+            val discNumber = cursor.getIntValue(Audio.Media.TRACK) / 1000
             val path = cursor.getStringValue(Audio.Media.DATA).orEmpty()
             val artist = cursor.getStringValue(Audio.Media.ARTIST) ?: MediaStore.UNKNOWN_STRING
             val folderName = if (isQPlus()) {
@@ -262,7 +264,7 @@ class SimpleMediaScanner(private val context: Application) {
                 val track = Track(
                     id = 0, mediaStoreId = id, title = title, artist = artist, path = path, duration = duration, album = album, genre = genre,
                     coverArt = coverArt, playListId = 0, trackId = trackId, folderName = folderName, albumId = albumId, artistId = artistId, genreId = genreId,
-                    year = year, dateAdded = dateAdded, orderInPlaylist = 0
+                    year = year, dateAdded = dateAdded, orderInPlaylist = 0, discNumber = discNumber
                 )
                 tracks.add(track)
             }
@@ -450,12 +452,13 @@ class SimpleMediaScanner(private val context: Application) {
             }
 
             val genre = retriever.extractMetadata(METADATA_KEY_GENRE).orEmpty()
+            val discNumber = retriever.extractMetadata(METADATA_KEY_DISC_NUMBER)?.toIntOrNull() ?: 0
 
             if (title.isNotEmpty()) {
                 val track = Track(
                     id = 0, mediaStoreId = 0, title = title, artist = artist, path = path, duration = duration, album = album, genre = genre,
                     coverArt = "", playListId = 0, trackId = trackId, folderName = folderName, albumId = 0, artistId = 0, genreId = 0,
-                    year = year, dateAdded = dateAdded, orderInPlaylist = 0, flags = FLAG_MANUAL_CACHE
+                    year = year, dateAdded = dateAdded, orderInPlaylist = 0, flags = FLAG_MANUAL_CACHE, discNumber = discNumber
                 )
                 // use hashCode() as id for tracking purposes, there's a very slim chance of collision
                 track.mediaStoreId = track.hashCode().toLong()

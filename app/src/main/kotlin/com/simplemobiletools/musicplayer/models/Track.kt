@@ -38,7 +38,8 @@ data class Track(
     @ColumnInfo(name = "year") var year: Int,
     @ColumnInfo(name = "date_added") var dateAdded: Int,
     @ColumnInfo(name = "order_in_playlist") var orderInPlaylist: Int,
-    @ColumnInfo(name = "flags") var flags: Int = 0
+    @ColumnInfo(name = "flags") var flags: Int = 0,
+    @ColumnInfo(name = "disc_number") var discNumber: Int,
 ) : Serializable, ListItem() {
 
     companion object {
@@ -62,7 +63,16 @@ data class Track(
                     }
                 }
 
-                sorting and PLAYER_SORT_BY_TRACK_ID != 0 -> first.trackId.compareTo(second.trackId)
+                sorting and PLAYER_SORT_BY_TRACK_ID != 0 -> {
+                    when {
+                        first.discNumber <= 0 && second.discNumber > 0 -> 1
+                        first.discNumber > 0 && second.discNumber <= 0 -> -1
+                        first.discNumber != second.discNumber -> first.discNumber.compareTo(second.discNumber)
+                        first.trackId == -1 && second.trackId != -1 -> 1
+                        first.trackId != -1 && second.trackId == -1 -> -1
+                        else -> first.trackId.compareTo(second.trackId)
+                    }
+                }
                 sorting and PLAYER_SORT_BY_DATE_ADDED != 0 -> first.dateAdded.compareTo(second.dateAdded)
                 sorting and PLAYER_SORT_BY_CUSTOM != 0 -> first.orderInPlaylist.compareTo(second.orderInPlaylist)
                 else -> first.duration.compareTo(second.duration)
